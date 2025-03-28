@@ -1,0 +1,741 @@
+$(window).on("load", function () {
+  var isRtl = FI.languageCode == "en-GB" ? false : true;
+
+  // var stopPace = $("body").hasClass("pace-stop");
+  // if (!stopPace) {
+  //   // Fix Pace Loading issue with external plugins
+  //   var initDestroyTimeOutPace = function () {
+  //     var counter = 0;
+
+  //     // var refreshIntervalId = setInterval(function () {
+  //     //   var progress;
+  //     //   if (
+  //     //     typeof $(".pace-progress").parent().attr("data-progress-text") !==
+  //     //     "undefined"
+  //     //   ) {
+  //     //     progress = Number(
+  //     //       $(".pace-progress")
+  //     //         .parent()
+  //     //         .attr("data-progress-text")
+  //     //         .replace("%", "")
+  //     //     );
+  //     //   }
+
+  //     //   if (progress === 99) {
+  //     //     counter++;
+  //     //   }
+
+  //     //   if (progress === 100) {
+  //     //     clearInterval(refreshIntervalId);
+  //     //   }
+
+  //     //   if (counter > 50) {
+  //     //     clearInterval(refreshIntervalId);
+  //     //     Pace.stop();
+  //     //   }
+  //     // }, 100);
+  //   };
+  //   initDestroyTimeOutPace();
+  // }
+
+  var setMainMenu = function () {
+    $.ajax({
+      type: "GET",
+      url:
+        "https://www.moj.gov.ae/eservicesutils.aspx?type=mainmenu&languageId=" +
+        FI.languageId,
+      crossDomain: true,
+      dataType: "json",
+      data: {},
+      success: function (response) {
+        // $(".main-menu-item").append($(response));
+        // $(
+        //   ".main-menu .navigation .main-menu-item li ul.sub-menu ul.sub-sub-menu ul.sub-sub-menu"
+        // ).remove(); //remove level 3 menu
+        $(".main-menu-item").slimmenu({
+          resizeWidth: "800",
+          collapserTitle: "",
+          childrenIndenter: "",
+          expandIcon: "",
+          collapseIcon: "",
+          animSpeed: "fast",
+          easingEffect: "easeOutQuint",
+          indentChildren: false,
+        });
+      },
+      error: function (ex) {
+        console.log(ex);
+      },
+    });
+  };
+  var setFooterMenu = function () {
+    $.ajax({
+      type: "GET",
+      url:
+        "https://www.moj.gov.ae/eservicesutils.aspx?type=footermenu&languageId=" +
+        FI.languageId,
+      crossDomain: true,
+      dataType: "json",
+      data: {},
+      success: function (response) {
+        // $(".footer-menu").append($(response));
+      },
+      error: function (ex) {
+        console.log(ex);
+      },
+    });
+  };
+
+  setMainMenu();
+  setFooterMenu();
+
+  $(".collapse-button").click(function () {
+    $("body").addClass("open-menu");
+  });
+  $(".close-btn .close").click(function () {
+    $("body").removeClass("open-menu");
+  });
+  $(".go-top").click(function (evt) {
+    evt.preventDefault();
+    $("html,body").animate({ scrollTop: 0 }, 700);
+  });
+  //close popup
+  $('.fi-popup .close,.fi-popup [data-close="fi-popup"]').click(function (evt) {
+    evt.preventDefault();
+    $(".fi-popup").removeClass("active");
+  });
+
+  // Google translate
+  window.googleTranslateElementInit = function () {
+    new google.translate.TranslateElement(
+      {
+        pageLanguage: FI.shortLanguageCode,
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        multilanguagePage: false,
+        gaTrack: false,
+      },
+      "google_translate_element"
+    );
+  };
+
+  //close popup
+  $(".fi-popup .close").click(function (evt) {
+    evt.preventDefault();
+    $(".fi-popup").removeClass("active");
+  });
+
+  $(document).on("click", "*", function (ev) {
+    if ($(this).hasClass("viewbio")) {
+      ev.preventDefault();
+
+      $(this).parents(".item").addClass("open-bio");
+      $("body").addClass("open-bio");
+    } else if ($(this).hasClass("close-bio")) {
+      ev.preventDefault();
+
+      $("body").removeClass("open-bio");
+      $(this).parents(".item").removeClass("open-bio");
+    } else if ($(this).hasClass("close-setting")) {
+      ev.preventDefault();
+
+      $("body").removeClass("open-setting");
+    } else if ($(this).hasClass("res-menu-a")) {
+      ev.preventDefault();
+      $("body").addClass("open-resmenu");
+    } else if ($(this).hasClass("close-menu-a")) {
+      ev.preventDefault();
+      $("body").removeClass("open-resmenu");
+    } else if ($(this).hasClass("view-pop")) {
+      ev.preventDefault();
+
+      $(this).parents(".item").addClass("open-pop");
+      $("body").addClass("open-pop");
+    } else if ($(this).hasClass("close-pop")) {
+      ev.preventDefault();
+
+      $("body").removeClass("open-pop");
+      $(this).parents(".item").removeClass("open-pop");
+    }
+  });
+
+  //#region Cookies
+  function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(";");
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) == " ") {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+  function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    if (!exdays) exdays = 365;
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
+    var expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  }
+  function deleteCookie(cname) {
+    document.cookie =
+      cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  }
+  //#endrgion // Cookies
+
+  //#region Settings
+
+  var fontSize = 14;
+  var settingspop = $('[data-toggle="settingspopup"]');
+  var fontincrease = settingspop.find('[data-toggle="fontincrease"]');
+  var fontdecrease = settingspop.find('[data-toggle="fontdecrease"]');
+  var printPage = $('[data-toggle="printpage"]');
+  var resetsettings = settingspop.find('[data-toggle="resetsettings"]');
+  var themesLinks = settingspop.find('[data-target="theme"]');
+  var listentopage = settingspop.find('[data-toggle="listentopage"]');
+
+  $(".view-settings").click(function (evt) {
+    evt.preventDefault();
+    $(".settings-popup").addClass("active");
+  });
+  themesLinks.click(function (ev) {
+    ev.preventDefault();
+    var theme = $(this).attr("data-toggle");
+    setTheme(theme, this);
+  });
+  var setTheme = function (themeclass, target) {
+    if (
+      (themeclass == "colorblindnesstheme" &&
+        $("html").hasClass("colorblindnesstheme")) ||
+      (themeclass == "nighttheme" && $("html").hasClass("nighttheme"))
+    ) {
+      themeclass = getCookie("prevtheme");
+    } else if (
+      themeclass == "colorblindnesstheme" ||
+      themeclass == "nighttheme"
+    ) {
+      if ($("html").data("currenttheme") != themeclass) {
+        setCookie("prevtheme", $("html").data("currenttheme"));
+      }
+    }
+
+    // remove all theme calsses
+    $("html").removeClass(
+      "redtheme greentheme goldtheme colorblindnesstheme nighttheme active"
+    );
+
+    if (!$("html").data("currenttheme")) {
+      $("html").data("currenttheme", "greentheme");
+    } else {
+      $("html").data("currenttheme", themeclass);
+    }
+
+    if ($("html").hasClass(themeclass)) {
+      $("html").removeClass(themeclass);
+      deleteCookie("theme", themeclass);
+    } else {
+      $("html").addClass(themeclass);
+      setCookie("theme", themeclass);
+    }
+
+    themesLinks.removeClass("active");
+    settingspop.find('[data-toggle="' + themeclass + '"]').addClass("active");
+
+    var zendeskClor = "";
+    if (themeclass == "redtheme") {
+      zendeskClor = "#d63200";
+    } else if (themeclass == "greentheme") {
+      zendeskClor = "#2c7500";
+    } else if (themeclass == "goldtheme") {
+      zendeskClor = "#bf9e66";
+    } else if (themeclass == "colorblindnesstheme") {
+      zendeskClor = "#8e8e8e";
+    } else if (themeclass == "nighttheme") {
+      zendeskClor = "#344956";
+    }
+
+    setZendeskColor(zendeskClor);
+
+    // Add theme query string to login/register/start service links
+    $(
+      ".sign-in-options .login-popup a,.sign-in-options .register-popup a,.st-serv-lnk, .header .logo a"
+    ).each(function () {
+      var href = $(this).attr("href");
+      if (href) {
+        $(this).attr(
+          "href",
+          updateQueryStringParameter(href, "theme", themeclass)
+        );
+      }
+    });
+  };
+
+  var setZendeskColor = function (zendeskClor) {
+    if (window.$zopim.livechat) {
+      window.$zopim.livechat.theme.setColor(zendeskClor);
+      window.$zopim.livechat.theme.reload();
+    } else {
+      setTimeout(function () {
+        setZendeskColor(zendeskClor);
+      }, 100);
+    }
+  };
+
+  if (getCookie("font-size")) {
+    fontSize = parseInt(getCookie("font-size"));
+    if (fontSize != 14) $("html").css("font-size", fontSize + "px");
+  }
+
+  var getUrlVars = function () {
+    var vars = [],
+      hash;
+    var hashes = window.location.href
+      .slice(window.location.href.indexOf("?") + 1)
+      .split("&");
+    for (var i = 0; i < hashes.length; i++) {
+      hash = hashes[i].split("=");
+      vars.push(hash[0]);
+      vars[hash[0]] = hash[1];
+    }
+    return vars;
+  };
+
+  var updateQueryStringParameter = function (uri, key, value) {
+    var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    var separator = uri.indexOf("?") !== -1 ? "&" : "?";
+    if (uri.match(re)) {
+      return uri.replace(re, "$1" + key + "=" + value + "$2");
+    } else {
+      return uri + separator + key + "=" + value;
+    }
+  };
+
+  fontincrease.click(function (ev) {
+    ev.preventDefault();
+    if (fontSize + 1 <= 16) {
+      fontSize += 1;
+    }
+    $("body").css("font-size", fontSize + "px");
+    setCookie("font-size", fontSize);
+  });
+
+  fontdecrease.click(function (ev) {
+    ev.preventDefault();
+    if (fontSize - 1 >= 12) {
+      fontSize -= 1;
+    }
+    $("body").css("font-size", fontSize + "px");
+    setCookie("font-size", fontSize);
+  });
+
+  printPage.click(function (ev) {
+    print();
+  });
+
+  listentopage.click(function (ev) {
+    ev.preventDefault();
+    if (!isRtl) {
+      $(".readspeaker-div-e").show();
+      $(".readspeaker-div-e audio")[0].play();
+    } else {
+      $(".readspeaker-div").show();
+      $(".readspeaker-div audio")[0].play();
+    }
+  });
+
+  resetsettings.click(function (ev) {
+    setTheme("goldtheme");
+    fontSize = 14;
+    $("body").css("font-size", fontSize + "px");
+    setCookie("font-size", fontSize);
+  });
+
+  // Current Themes. check the URL if it has them key then sit the cookie to this theme
+  var theme = getUrlVars()["theme"];
+  if (theme) {
+    var themeclass = theme;
+    if (
+      [
+        "redtheme",
+        "greentheme",
+        "goldtheme",
+        "colorblindnesstheme",
+        "nighttheme",
+      ].includes(themeclass)
+    ) {
+      setCookie("theme", themeclass);
+    }
+  }
+
+  theme = getCookie("theme");
+  if (theme) {
+    setTheme(theme);
+  }
+
+  //#endregion // Settings
+
+  //#region tours
+  window.tour;
+  var initTour = function (t) {
+    if (t) t.init();
+  };
+  var startTour = function (t) {
+    if (t) t.start();
+  };
+  var restartTour = function (t) {
+    if (t) t.restart();
+  };
+  tourOptions.onEnd = function (_tour) {
+    $(".popover").hide();
+  };
+  window.callTour = function () {
+    if (window.tour) restartTour(window.tour);
+    else {
+      tour = new Tour(tourOptions);
+      initTour(window.tour);
+      startTour(window.tour);
+    }
+    return false;
+  };
+  $(".view-tour").click(function (ev) {
+    ev.preventDefault();
+    $(".fi-popup").removeClass("active");
+    return callTour();
+  });
+  //#endregion tours
+
+  //#region search
+
+  var searchTemplate =
+    '<a href="javascript:;" class="speak-now"><i class="fi-mic"></i><span class="speak-instructions">{{instructions}}</span></a>';
+  var searchElement = $(".search-popup input");
+  var searchHandle;
+  var finalTranscript;
+  var recognition;
+  var ignoreOnEnd;
+  var startTimeStamp;
+  var recognizing;
+
+  var speakNowLabel = FI.languageId == 1 ? "Speak Now!" : "تحدث الان!";
+  var searchByVoice = FI.languageId == 1 ? "Search by voice" : "بحث بالصوت";
+  var searchVoiceAllow =
+    FI.languageId == 1
+      ? 'Click the "Allow" button above to enable your microphone.'
+      : "اضط على زر السماح لتفعيل المايكروفون";
+  var speakNowInstructions =
+    FI.languageId == 1 ? "Speak now..." : "تحدث الان...";
+  var searchVoiceNoSpeech =
+    FI.languageId == 1
+      ? "No speech was detected. You may need to adjust your microphone settings."
+      : "لم يتم التقاط الصوت ربما تحتاج لضبط اعدادات المايكروفون";
+  var searchVoiceNoMicrophone =
+    FI.languageId == 1
+      ? "No microphone was found. Please ensure that a microphone is installed."
+      : "لم يتم العثور على مايكروفون يرجى التأكد من تثبيته";
+  var searchVoiceDenied =
+    FI.languageId == 1
+      ? "Permission to use microphone was denied"
+      : "تم رفض طلب الاذن باستعمال المايكروفون";
+  var searchVoiceBlocked =
+    FI.languageId == 1
+      ? "Permission to use microphone is blocked."
+      : "تم حظر استعمال الماكروفون";
+
+  var speechRecognition = function () {
+    if ("webkitSpeechRecognition" in window) {
+      if (searchElement.parent().parent().find(".btn-close").length > 0) {
+        searchHandle = $(
+          Mustache.render(searchTemplate, {
+            speakNowLabel: speakNowLabel,
+            instructions: searchByVoice,
+          })
+        ).insertBefore(searchElement.parent().parent().find(".btn-close"));
+      } else if (searchElement.parents(".search-form").length > 0) {
+        searchHandle = $(
+          Mustache.render(searchTemplate, {
+            speakNowLabel: speakNowLabel,
+            instructions: searchByVoice,
+          })
+        ).insertAfter(searchElement);
+      } else {
+        searchHandle = $(
+          Mustache.render(searchTemplate, {
+            speakNowLabel: speakNowLabel,
+            instructions: searchByVoice,
+          })
+        ).appendTo(searchElement.parent());
+      }
+
+      searchHandle.hover(
+        function () {
+          $(this).addClass("hovered");
+        },
+        function () {
+          $(this).removeClass("hovered");
+        }
+      );
+      searchElement.parent().addClass("speak-enabled");
+      finalTranscript = "";
+      searchHandle.on("click", $.proxy(speechRecognitionStart, this));
+
+      recognition = new webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.onstart = $.proxy(speechRecognitionRecognitionStart, this);
+      recognition.onend = $.proxy(speechRecognitionRecognitionEnd, this);
+      recognition.onerror = $.proxy(speechRecognitionRecognitionError, this);
+      recognition.onresult = $.proxy(speechRecognitionRecognitionResult, this);
+    }
+  };
+  var speechRecognitionStart = function (ev) {
+    if (ev) {
+      ev.preventDefault();
+    }
+    if (this.recognizing) {
+      this.recognition.stop();
+      return;
+    }
+    finalTranscript = "";
+    recognition.lang = FI.languageCode;
+    recognition.start();
+    ignoreOnEnd = false;
+    startTimeStamp = event.timeStamp;
+    searchHandle
+      .removeClass("started")
+      .addClass("disabled")
+      .find(".speak-instructions")
+      .text(searchVoiceAllow);
+  };
+  var speechRecognitionRecognitionStart = function () {
+    recognizing = true;
+    searchHandle
+      .removeClass("disabled")
+      .addClass("started")
+      .find(".speak-instructions")
+      .text(speakNowInstructions);
+  };
+  var speechRecognitionRecognitionEnd = function () {
+    recognizing = false;
+
+    if (ignoreOnEnd) {
+      return;
+    }
+
+    searchHandle
+      .removeClass("disabled started")
+      .find(".speak-instructions")
+      .text(searchByVoice);
+  };
+  var speechRecognitionRecognitionError = function (event) {
+    if (event.error == "no-speech") {
+      searchHandle
+        .removeClass("disabled started")
+        .find(".speak-instructions")
+        .text(searchVoiceNoSpeech);
+      ignoreOnEnd = true;
+    }
+    if (event.error == "audio-capture") {
+      searchHandle
+        .removeClass("disabled started")
+        .find(".speak-instructions")
+        .text(searchVoiceNoMicrophone);
+      ignoreOnEnd = true;
+    }
+    if (event.error == "not-allowed") {
+      if (event.timeStamp - startTimeStamp < 100) {
+        searchHandle
+          .removeClass("started")
+          .addClass("disabled")
+          .find(".speak-instructions")
+          .text(searchVoiceBlocked);
+      } else {
+        searchHandle
+          .removeClass("started")
+          .addClass("disabled")
+          .find(".speak-instructions")
+          .text(searchVoiceDenied);
+      }
+      ignoreOnEnd = true;
+    }
+  };
+  var speechRecognitionRecognitionResult = function (event) {
+    var interimTranscript = "";
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript;
+      } else {
+        interimTranscript += event.results[i][0].transcript;
+      }
+    }
+
+    if (finalTranscript.length > 0) {
+      searchElement.val(finalTranscript);
+      setTimeout(
+        $.proxy(function () {
+          var e = $.Event("keydown", { keyCode: 13 });
+          searchElement.trigger(e);
+        }, this),
+        1000
+      );
+    }
+  };
+
+  $(".view-search").click(function (evt) {
+    evt.preventDefault();
+    $(".search-popup").addClass("active");
+    $(".search-popup input").focus();
+  });
+  try {
+    $('.search-popup [data-toggle="searchico"]').click(function () {
+      if ($(".search-popup input").val().length < 1) {
+        $(".search-popup input").focus();
+      } else {
+        window.location =
+          "https://www.moj.gov.ae/" +
+          FI.languageCode.substring(0, 2) +
+          "/search.aspx?type=all&query=" +
+          encodeURIComponent($(".search-popup input").val());
+      }
+    });
+    $(".search-popup input").keyup(
+      $.debounce(300, function (e) {
+        var keyword = $(this).val();
+        var words = $('.search-popup [data-toggle="words-list"]');
+        var container = $(".search-popup .keyword-suggestions");
+        var searchMoreOptions = $(".search-popup .search-more-options-wrapper");
+
+        if (e.keyCode == 38 || e.keyCode == 40)
+          //up and down, enter key ignor
+          return true;
+
+        if (e.keyCode == 13) {
+          {
+            if ($(".search-popup input").val().length < 1) {
+              $(".search-popup input").focus();
+            } else {
+              window.location =
+                "/" +
+                FI.languageCode.substring(0, 2) +
+                "/search.aspx?type=all&query=" +
+                encodeURIComponent($(".search-popup input").val());
+            }
+            return false;
+          }
+        }
+
+        if (keyword.length > 2) {
+          $.ajax({
+            type: "GET",
+            url:
+              "https://www.moj.gov.ae/eservicesutils.aspx?type=suggestions&languageId=" +
+              FI.languageId +
+              "&title=" +
+              keyword,
+            crossDomain: true,
+            dataType: "json",
+            data: {},
+            success: function (response) {
+              if (response) {
+                words.html(response);
+                container.addClass("open");
+                searchMoreOptions.addClass("hidden");
+              } else {
+                container.removeClass("open");
+                searchMoreOptions.removeClass("hidden");
+              }
+            },
+            error: function (xhr, status, error) {
+              console.log(error);
+            },
+          });
+        } else {
+          container.removeClass("open");
+          searchMoreOptions.removeClass("hidden");
+        }
+
+        return true;
+      })
+    );
+    speechRecognition();
+  } catch (e) {}
+
+  //#endregion search
+
+  //#region newsletter
+
+  var $popup = $(".newsletter-popup");
+  var $btnSubscribe = $(".fi-newsletter.subscribe");
+  var $submit = $(".submit");
+  var $email = $popup.find("#email");
+  var $messageError = $popup.find(".message.error");
+
+  var requiredControls = $popup.find(
+    ".form-fields.required input, .form-fields.required textarea"
+  );
+  var formControls = $popup.find(".form-fields input, .form-fields textarea");
+
+  var subscribeNow = function () {
+    var isValied = true;
+    requiredControls.parent().removeClass("error");
+    $popup.removeClass("error");
+
+    // validate form controls
+    requiredControls.each(function (idx, el) {
+      var $el = $(el);
+      if ($el.val() == "") {
+        $el.parent().addClass("error");
+        isValied = false;
+      }
+    });
+
+    if (isValied) {
+      $.ajax({
+        type: "GET",
+        url:
+          "https://www.moj.gov.ae/eservicesutils.aspx?type=subscribe&languageId=" +
+          FI.languageId +
+          "&email=" +
+          $email.val(),
+        crossDomain: true,
+        dataType: "text",
+        data: {},
+        success: function (response) {
+          var obj = JSON.parse(response);
+          if (obj.code == 200) {
+            $popup.addClass("succeed");
+            formControls.val("").parent().removeClass("error");
+
+            // close popup
+            setTimeout(function () {
+              $popup.removeClass("active");
+            }, 3000);
+          } else {
+            $popup.addClass("error");
+            $messageError.html(obj.message);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.log(error);
+        },
+      });
+    }
+  };
+
+  $submit.click(function (evt) {
+    evt.preventDefault();
+    subscribeNow();
+  });
+
+  $btnSubscribe.click(function (evt) {
+    evt.preventDefault();
+    $popup.addClass("active");
+    formControls.val("").parent().removeClass("error");
+    $popup.removeClass("succeed").removeClass("error");
+  });
+
+  //#endregion newsletter
+});
